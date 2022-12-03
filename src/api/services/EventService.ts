@@ -2,11 +2,19 @@ import {Service} from 'typedi';
 import Web3 from 'web3';
 import {RegisterQuery} from '../controllers/requests/EventType';
 import {env} from '../../env';
-import {buildForwardTxRequest, getBiconomyForwarderConfig} from './BiconomyForwarderHelpers';
+import {buildForwardTxRequest, getBiconomyForwarderConfig, getDataToSignForPersonalSign} from './BiconomyForwarderHelpers';
 import {ABI} from '../../config/constant';
 
 @Service()
 export class EventService {
+
+    constructor(
+        private web3: any,
+    ) {
+        this.web3 = new Web3(
+            new Web3.providers.HttpProvider(env.ethIndia.polygonUrl)
+        );
+    }
     public async getRegisterData(registerQuery: RegisterQuery): Promise<any> {
         const web3 = new Web3(new Web3.providers.HttpProvider(env.ethIndia.polygonUrl));
         const networkId: any = env.ethIndia.networkId;
@@ -45,7 +53,10 @@ export class EventService {
             data: functionSignature,
         });
 
-        return request;
-
+        const hashToSign = await getDataToSignForPersonalSign(request);
+        const rawData: any = Object.values(hashToSign);
+        const dataToSign =  this.web3.utils.bytesToHex(rawData);
+        const reqestedData = JSON.stringify(request);
+        return {dataToSign, request: reqestedData};
     }
 }
