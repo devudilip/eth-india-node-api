@@ -135,6 +135,14 @@ export class EventService {
             const publicKey = ecrecover(msg, sig.v, sig.r, sig.s);
             const pubAddress = pubToAddress(publicKey);
             const address = addHexPrefix(pubAddress.toString('hex'));
+            const ethIndiaContract = new web3.eth.Contract(
+                ABI,
+                env.ethIndia.nftAddress
+            );
+            const nftresponse: number = await ethIndiaContract.methods
+                .freeMintedList(address)
+                .call();
+            const nftId: number = Number(nftresponse);
 
             const adminUrl = env.ethIndia.adminUrl;
             const url = `${adminUrl}/users/${address}`;
@@ -142,13 +150,6 @@ export class EventService {
             if (user && user.verified) {
                 throw new Error(`${address} is already verified`);
             } else {
-                const ethIndiaContract = new web3.eth.Contract(
-                    ABI,
-                    env.ethIndia.nftAddress
-                );
-                const nftId: number = await ethIndiaContract.methods
-                    .freeMintedList(address)
-                    .call();
                 if (nftId && nftId >= 0) {
                     const updateUserUrl = `${adminUrl}/users/update_user/?address=${address}`;
                     // tslint:disable-next-line:no-shadowed-variable
