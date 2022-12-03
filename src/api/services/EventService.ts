@@ -112,4 +112,15 @@ export class EventService {
             return error;
         }
     }
+
+    public async getNftData(query: RegisterQuery): Promise<any> {
+
+        const url = `https://api.covalenthq.com/v1/137/address/${query.address}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=true&key=ckey_8e6054f8ee1847c59ddbffd5ed6`;
+
+        const nftDetails: any = await got(url).json();
+
+        // tslint:disable-next-line:max-line-length
+        const userNft = nftDetails.data.items.find(item => item?.type === 'nft' && item?.contract_address?.toLowerCase() === env.ethIndia.nftAddress.toLowerCase());
+        return userNft;
+    }
 }

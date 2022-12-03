@@ -16,4 +16,9 @@ export class EventController {
     public register(@Body() data: PostRegisterQuery): Promise<object | undefined> {
         return this.eventService.register(data);
     }
+
+    @Get('/nft-detail')
+    public getNftDetail(@QueryParams() query: RegisterQuery): Promise<object> {
+        return this.eventService.getNftData(query);
+    }
 }
