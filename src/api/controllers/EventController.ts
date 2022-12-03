@@ -1,5 +1,5 @@
-import {Get, JsonController, QueryParams} from 'routing-controllers';
-import {RegisterQuery} from './requests/EventType';
+import {Body, Get, JsonController, Post, QueryParams} from 'routing-controllers';
+import {PostRegisterQuery, RegisterQuery} from './requests/EventType';
 import {EventService} from '../services/EventService';
 
 @JsonController('/event')
@@ -10,5 +10,10 @@ export class EventController {
     @Get('/register')
     public getRegisterData(@QueryParams() query: RegisterQuery): Promise<object> {
         return this.eventService.getRegisterData(query);
+    }
+
+    @Post('/register')
+    public register(@Body() data: PostRegisterQuery): Promise<object | undefined> {
+        return this.eventService.register(data);
     }
 }

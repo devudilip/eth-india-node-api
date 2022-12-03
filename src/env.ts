@@ -76,5 +76,7 @@ export const env = {
         polygonUrl: getOsEnv('POLYGON_URL'),
         networkId: getOsEnv('NETWORK_ID'),
         nftAddress: getOsEnv('NFT_ADDRESS'),
+        dappId:  getOsEnv('DAPP_ID'),
+        apiKey:  getOsEnv('API_KEY'),
     },
 };

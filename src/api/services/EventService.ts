@@ -1,6 +1,6 @@
 import {Service} from 'typedi';
 import Web3 from 'web3';
-import {RegisterQuery} from '../controllers/requests/EventType';
+import {PostRegisterQuery, RegisterQuery} from '../controllers/requests/EventType';
 import {env} from '../../env';
 import {buildForwardTxRequest, getBiconomyForwarderConfig, getDataToSignForPersonalSign} from './BiconomyForwarderHelpers';
 import {ABI} from '../../config/constant';
@@ -58,5 +58,37 @@ export class EventService {
         const dataToSign =  this.web3.utils.bytesToHex(rawData);
         const reqestedData = JSON.stringify(request);
         return {dataToSign, request: reqestedData};
+    }
+
+    public async register(query: PostRegisterQuery): Promise<object> {
+        const requestedData = JSON.parse(query.request);
+        const  params = [requestedData, query.sign_data];
+        const signatureType = 'PERSONAL_SIGN';
+        const dappId: any = env.ethIndia.dappId;
+        const apiKey: any = env.ethIndia.apiKey;
+        const nftContractAddress: any = env.ethIndia.nftAddress;
+        const request = {
+            to: nftContractAddress,
+            apiId: dappId,
+            params,
+            from: requestedData.from,
+            signatureType,
+        };
+        try {
+            const res =  await fetch(`https://api.biconomy.io/api/v2/meta-tx/native`, {
+                method: 'POST',
+                headers: {
+                    'x-api-key': apiKey,
+                    'Content-Type': 'application/json;charset=utf-8',
+                },
+                body: JSON.stringify(request),
+            }).then((response) => response.json());
+            if (res?.txHash) {
+                console.log(res?.txHash);
+            }
+            return res;
+        } catch (error) {
+            return error;
+        }
     }
 }

@@ -57,6 +57,7 @@
     "faker": "^4.1.0",
     "figlet": "^1.2.0",
     "glob": "^7.1.2",
+    "got": "^12.5.3",
     "helmet": "^3.9.0",
     "jsonfile": "5.0.0",
     "microframework-w3tec": "^0.6.3",
