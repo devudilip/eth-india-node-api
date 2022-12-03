@@ -78,5 +78,10 @@ export const env = {
         nftAddress: getOsEnv('NFT_ADDRESS'),
         dappId:  getOsEnv('DAPP_ID'),
         apiKey:  getOsEnv('API_KEY'),
+        adminUrl: getOsEnv('ADMIN_URL'),
+    },
+    pinata: {
+        key: getOsEnv('PINATA_KEY'),
+        secret: getOsEnv('PINATA_SECRET'),
     },
 };

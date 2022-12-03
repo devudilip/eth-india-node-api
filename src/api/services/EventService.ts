@@ -4,11 +4,14 @@ import {PostRegisterQuery, RegisterQuery} from '../controllers/requests/EventTyp
 import {env} from '../../env';
 import {buildForwardTxRequest, getBiconomyForwarderConfig, getDataToSignForPersonalSign} from './BiconomyForwarderHelpers';
 import {ABI} from '../../config/constant';
+import got from 'got';
+import {UtilService} from './UtilService';
 
 @Service()
 export class EventService {
 
     constructor(
+        private utilService: UtilService,
         private web3: any
     ) {
         this.web3 = new Web3(
@@ -26,11 +29,29 @@ export class EventService {
             nftContractAddress
         );
 
+        // const adminUrl = 'https://rails-admin-api.herokuapp.com';
+        // const adminUrl = 'http://localhost:3001';
+        const adminUrl = env.ethIndia.adminUrl;
+        const url = `${adminUrl}/events/${registerQuery.eventId}`;
+
+        const event: any = await got(url).json();
+        console.log(event);
+
+        const body = {
+            name: event.name,
+            description: 'The Event with web3 ticketing',
+            image: 'ipfs://QmVucKoZZ4tP5HgU37UkZix5kWCKK87TXddBRmJZyXcwnz',
+            attributes: [
+                {trait_type: 'event', value: 'The event 2022'},
+            ],
+        };
+        const ipfsResponse: any = await this.utilService.pinJSONToIPFS(body);
+
         const functionSignature: any = ethIndiaContract.methods
-            .freeMint('string')
+            .freeMint(ipfsResponse?.url)
             .encodeABI();
         const txGas: any = await ethIndiaContract.methods
-            .freeMint('string')
+            .freeMint(ipfsResponse?.url)
             .estimateGas({from: userAddress});
 
         const forwarder: any = await getBiconomyForwarderConfig(networkId);

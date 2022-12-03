@@ -4,6 +4,10 @@ export class RegisterQuery {
     @IsNotEmpty()
     @IsString()
     public address: string;
+
+    @IsNotEmpty()
+    @IsString()
+    public eventId: string;
 }
 
 export class PostRegisterQuery {
