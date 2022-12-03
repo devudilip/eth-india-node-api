@@ -1,6 +1,7 @@
 import {Service} from 'typedi';
 import Web3 from 'web3';
-import {PostRegisterQuery, RegisterQuery} from '../controllers/requests/EventType';
+import {PostRegisterQuery, RegisterQuery, SignedUserQuery} from '../controllers/requests/EventType';
+import { fromRpcSig, addHexPrefix, hashPersonalMessage, ecrecover, pubToAddress } from 'ethereumjs-util';
 import {env} from '../../env';
 import {buildForwardTxRequest, getBiconomyForwarderConfig, getDataToSignForPersonalSign} from './BiconomyForwarderHelpers';
 import {ABI} from '../../config/constant';
@@ -122,5 +123,56 @@ export class EventService {
         // tslint:disable-next-line:max-line-length
         const userNft = nftDetails.data.items.find(item => item?.type === 'nft' && item?.contract_address?.toLowerCase() === env.ethIndia.nftAddress.toLowerCase());
         return userNft;
+    }
+
+    public async confirmSignedUser(signedUserQuery: SignedUserQuery): Promise<any> {
+        try {
+            const web3 = new Web3(new Web3.providers.HttpProvider(env.ethIndia.polygonUrl));
+            const {data} = signedUserQuery;
+            const message = 'Example `personal_sign` message';
+            const sig = fromRpcSig(addHexPrefix(data));
+            const msg = hashPersonalMessage(Buffer.from(message));
+            const publicKey = ecrecover(msg, sig.v, sig.r, sig.s);
+            const pubAddress = pubToAddress(publicKey);
+            const address = addHexPrefix(pubAddress.toString('hex'));
+
+            const adminUrl = env.ethIndia.adminUrl;
+            const url = `${adminUrl}/users/${address}`;
+            const user: any = await got(url).json();
+            if (user && user.verified) {
+                throw new Error(`${address} is already verified`);
+            } else {
+                const ethIndiaContract = new web3.eth.Contract(
+                    ABI,
+                    env.ethIndia.nftAddress
+                );
+                const nftId: number = await ethIndiaContract.methods
+                    .freeMintedList(address)
+                    .call();
+                if (nftId && nftId >= 0) {
+                    const updateUserUrl = `${adminUrl}/users/update_user/?address=${address}`;
+                    // tslint:disable-next-line:no-shadowed-variable
+                    const user: any = await got(updateUserUrl).json();
+                    console.log(user);
+                    return {
+                        success: true,
+                        message: `${nftId}`,
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: 'verification failed',
+                    };
+                }
+            }
+
+        } catch (err) {
+            return {
+                error: {
+                    code: 503,
+                    message: err.toString(),
+                },
+            };
+        }
     }
 }

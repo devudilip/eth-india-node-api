@@ -23,3 +23,9 @@ export class PostRegisterQuery {
     @IsString()
     public request: string;
 }
+
+export class SignedUserQuery {
+    @IsNotEmpty()
+    @IsString()
+    public data: string;
+}
