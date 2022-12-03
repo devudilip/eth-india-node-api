@@ -72,4 +72,9 @@ export const env = {
         username: getOsEnv('MONITOR_USERNAME'),
         password: getOsEnv('MONITOR_PASSWORD'),
     },
+    ethIndia: {
+        polygonUrl: getOsEnv('POLYGON_URL'),
+        networkId: getOsEnv('NETWORK_ID'),
+        nftAddress: getOsEnv('NFT_ADDRESS'),
+    },
 };
