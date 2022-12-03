@@ -9,7 +9,7 @@ import {ABI} from '../../config/constant';
 export class EventService {
 
     constructor(
-        private web3: any,
+        private web3: any
     ) {
         this.web3 = new Web3(
             new Web3.providers.HttpProvider(env.ethIndia.polygonUrl)
