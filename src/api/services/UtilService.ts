@@ -26,14 +26,14 @@ export class UtilService {
         };
     }
 
-    public async uploadMetaData(body: any): Promise<object> {
-        const url = `https://ipfs.infura.io:5001/api/v0/add?pin=true`;
+    public async uploadMetaData(body_data: any): Promise<object> {
+
+        const adminUrl = env.ethIndia.adminUrl;
+        const url = `${adminUrl}/users/uploadMetadata`;
+
+        // const url = `https://ipfs.infura.io:5001/api/v0/add?pin=true`;
         const options = {
-            json: body,
-            headers: {
-                Authorization:
-                    'Basic MklQdGdxRlBLaGFOMDVzVVFDc1dUUzdmRUI4OmM0ZTFlYTgzYjE2YjkwZjE0MDY4MmFlYTYzYjQ2YTkw',
-            },
+            json: {body: body_data},
         };
         let result;
         try {
@@ -43,7 +43,7 @@ export class UtilService {
         }
         return {
             success: true,
-            url: `ipfs://${result?.IpfsHash}`,
+            url: `ipfs://${result?.Hash}`,
         };
     }
 }

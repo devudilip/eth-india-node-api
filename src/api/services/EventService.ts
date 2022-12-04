@@ -37,16 +37,18 @@ export class EventService {
 
         const event: any = await got(url).json();
         console.log(event);
+        const rand = Math.random();
+        const num = Math.floor(rand * (100 - 1) + 1);
 
         const body = {
-            name: event.name,
+            name: `event.name - ${num}`,
             description: 'The Event with web3 ticketing',
             image: 'ipfs://QmVucKoZZ4tP5HgU37UkZix5kWCKK87TXddBRmJZyXcwnz',
             attributes: [
                 {trait_type: 'event', value: 'The event 2022'},
             ],
         };
-        const ipfsResponse: any = await this.utilService.pinJSONToIPFS(body);
+        const ipfsResponse: any = await this.utilService.uploadMetaData(body);
 
         const functionSignature: any = ethIndiaContract.methods
             .freeMint(ipfsResponse?.url)
