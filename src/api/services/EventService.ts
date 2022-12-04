@@ -148,7 +148,7 @@ export class EventService {
         try {
             const web3 = new Web3(new Web3.providers.HttpProvider(env.ethIndia.polygonUrl));
             const {data} = signedUserQuery;
-            const message = 'Example `personal_sign` message';
+            const message = 'ETH INDIA 2022';
             const sig = fromRpcSig(addHexPrefix(data));
             const msg = hashPersonalMessage(Buffer.from(message));
             const publicKey = ecrecover(msg, sig.v, sig.r, sig.s);
