@@ -115,13 +115,30 @@ export class EventService {
     }
 
     public async getNftData(query: RegisterQuery): Promise<any> {
+        const web3 = new Web3(new Web3.providers.HttpProvider(env.ethIndia.polygonUrl));
+        const ethIndiaContract = new web3.eth.Contract(
+            ABI,
+            env.ethIndia.nftAddress
+        );
+        const userNft: any = {};
 
-        const url = `https://api.covalenthq.com/v1/137/address/${query.address}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=true&key=ckey_8e6054f8ee1847c59ddbffd5ed6`;
-
-        const nftDetails: any = await got(url).json();
+        const nftresponse: number = await ethIndiaContract.methods
+            .freeMintedList(query.address)
+            .call();
+        const nftId: number = Number(nftresponse);
 
         // tslint:disable-next-line:max-line-length
-        const userNft = nftDetails.data.items.find(item => item?.type === 'nft' && item?.contract_address?.toLowerCase() === env.ethIndia.nftAddress.toLowerCase());
+        // const url = `https://api.covalenthq.com/v1/137/address/${query.address}/balances_v2/?quote-currency=USD&format=JSON&nft=true&no-nft-fetch=true&key=ckey_8e6054f8ee1847c59ddbffd5ed6`;
+
+        // const nftDetails: any = await got(url).json();
+
+        // tslint:disable-next-line:max-line-length
+        // const userNft = nftDetails.data.items.find(item => item?.type === 'nft' && item?.contract_address?.toLowerCase() === env.ethIndia.nftAddress.toLowerCase());
+        if (nftId && nftId >= 0) {
+            userNft.logo_url = 'https://ipfs.io/ipfs/QmVucKoZZ4tP5HgU37UkZix5kWCKK87TXddBRmJZyXcwnz';
+            userNft.token_id = nftId;
+            userNft.contract_address = env.ethIndia.nftAddress;
+        }
         return userNft;
     }
 
